@@ -58,7 +58,13 @@ This project was compiled from a Native Tools x64 Command Prompt using Microsoft
 Use this command exactly:
 
 ```bat
-cl /EHsc /MD repro.cpp /I"C:\_dev\_opengl\glfw\include" /I"C:\_dev\_opengl\glew\include" /DWIN32 /D_WINDOWS /DGLFW_DLL /link /LIBPATH:"C:\_dev\_opengl\glfw\lib-vc2022" /LIBPATH:"C:\_dev\_opengl\glew\lib\Release\x64" opengl32.lib user32.lib gdi32.lib shell32.lib glfw3dll.lib glew32.lib
+cl /EHsc /MD repro.cpp ^
+/I"C:\_dev\_opengl\glfw\include" /I"C:\_dev\_opengl\glew\include" ^
+/DWIN32 /D_WINDOWS /DGLFW_DLL ^
+/link ^
+/LIBPATH:"C:\_dev\_opengl\glfw\lib-vc2022" ^
+/LIBPATH:"C:\_dev\_opengl\glew\lib\Release\x64" ^
+opengl32.lib user32.lib gdi32.lib shell32.lib glfw3dll.lib glew32.lib
 ```
 
 ## How to run
