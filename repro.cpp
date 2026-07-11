@@ -31,6 +31,10 @@ out vec4 FragColor;
 
 const float pi = 3.14159265358979323846;
 
+const float value = 23.53;
+float value_F = value;
+uniform float value_U = value;
+
 float sinM(float x)
 {
     return sin(mod(x, 2.0 * pi));
@@ -38,12 +42,12 @@ float sinM(float x)
 
 float randA(vec2 inCoord)
 {
-    return fract(sinM(dot(inCoord, vec2(23.53, 44.0))) * 42350.45);
+    return fract(sinM(dot(inCoord, vec2(value_F, 44.0))) * 42350.45);
 }
 
 float randB(vec2 inCoord)
 {
-    return fract(sinM(dot(inCoord, vec2(23.5, 44.0))) * 42350.45);
+    return fract(sinM(dot(inCoord, vec2(value_U, 44.0))) * 42350.45);
 }
 
 float perlinA(vec2 inCoord)
