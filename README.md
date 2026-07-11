@@ -33,3 +33,6 @@ In the side-by-side version:
 - **Right** = reduced perlin output using `uniform float`.
 
 If both sides were effectively equivalent for this shader path, the two panels would look identical.
+However they differ significantly. With the left side exhibiting the issue from the original report.
+<img width="1202" height="938" alt="obraz" src="https://github.com/user-attachments/assets/6e8dc11d-82bf-4a9b-a06f-345e848ab7b8" />
+
