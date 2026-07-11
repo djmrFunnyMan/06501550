@@ -135,7 +135,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* win = glfwCreateWindow(1200, 900, "Case 06501550 repro | 1 = Left: perlinA (23.53) | 2 = Right: perlinB (23.5)", nullptr, nullptr);
+    GLFWwindow* win = glfwCreateWindow(1200, 900, "Case 06501550 repro | 1 = Left: perlinA (float 23.53) | 2 = Right: perlinB (uniform 23.53)", nullptr, nullptr);
     if (!win) {
         std::cerr << "glfwCreateWindow failed\n";
         glfwTerminate();
