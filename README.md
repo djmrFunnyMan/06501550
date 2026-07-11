@@ -10,7 +10,7 @@ float randA(vec2 inCoord) {return fract(sinM(dot(inCoord, vec2(value_F, 44.0))) 
 Changing it to the following fixes the issue.
 
 ```glsl
-uniform float value_U =  = 23.53;
+uniform float value_U = 23.53;
 float randB(vec2 inCoord) {return fract(sinM(dot(inCoord, vec2(value_U, 44.0))) * 42350.45);}
 ```
 
