@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 static const char* vs_src = R"(
 #version 330 core
@@ -29,6 +30,10 @@ static const char* fs_src = R"(
 in vec2 uv;
 out vec4 FragColor;
 
+uniform vec2 gridOffset;
+
+float current_float = 23;  // manually test these values: (23) | (23.5) | (23.75) | (23.625) | (23.03125) | (23.000488) | (23.53)
+
 const float pi = 3.14159265358979323846;
 
 float sinM(float x)
@@ -38,13 +43,9 @@ float sinM(float x)
 
 float randA(vec2 inCoord)
 {
-    return fract(sinM(dot(inCoord, vec2(23.53, 44.0))) * 42350.45);
+    return fract(sinM(dot(inCoord, vec2(current_float, 44.0))) * 42350.45);
 }
 
-float randB(vec2 inCoord)
-{
-    return fract(sinM(dot(inCoord, vec2(23.5, 44.0))) * 42350.45);
-}
 
 float perlinA(vec2 inCoord)
 {
@@ -60,36 +61,20 @@ float perlinA(vec2 inCoord)
     return mix(mix(a, b, coord.x), mix(c, d, coord.x), coord.y);
 }
 
-float perlinB(vec2 inCoord)
-{
-    vec2 i = floor(inCoord);
-    vec2 j = fract(inCoord);
-    vec2 coord = smoothstep(0.0, 1.0, j);
-
-    float a = randB(i);
-    float b = randB(i + vec2(1.0, 0.0));
-    float c = randB(i + vec2(0.0, 1.0));
-    float d = randB(i + vec2(1.0, 1.0));
-
-    return mix(mix(a, b, coord.x), mix(c, d, coord.x), coord.y);
-}
 
 void main()
 {
     vec2 gridUV = uv;
 
-    if (uv.x < 0.5)
-        gridUV.x = uv.x * 2.0;
-    else
-        gridUV.x = (uv.x - 0.5) * 2.0;
+    gridUV.x = uv.x * 2.0;
 
-    vec2 inCoord = gridUV * 16.0;
+    vec2 inCoord = gridUV * 64.0 - gridOffset;
 
-    float v = (uv.x < 0.5) ? perlinA(inCoord) : perlinB(inCoord);
+    float v = perlinA(inCoord);
 
     vec3 color = vec3(v);
 
-    float divider = 1.0 - smoothstep(0.0, 0.002, abs(uv.x - 0.5));
+    float divider = 0.0;
     color = mix(color, vec3(1.0), divider);
 
     FragColor = vec4(color, 1.0);
@@ -131,7 +116,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* win = glfwCreateWindow(1200, 900, "Case 06501550 repro | 1 = Left: perlinA (23.53) | 2 = Right: perlinB (23.5)", nullptr, nullptr);
+    GLFWwindow* win = glfwCreateWindow(1200, 900, "Case 06501550 repro | UP Arrow = High Speed | DOWN Arrow = Low Speed | LEFT Arrow & Right Arrow = Apply Offset", nullptr, nullptr);
     if (!win) {
         std::cerr << "glfwCreateWindow failed\n";
         glfwTerminate();
@@ -182,15 +167,39 @@ int main()
     glBindVertexArray(vao);
 
     glUseProgram(prog);
+    int gridOffsetLoc = glGetUniformLocation(prog, "gridOffset");
+    float offsetX = 0.0f;
+    float offsetY = 0.0f;
+	float speed1 = 10000.0f;
+
+    auto prefFrameTime = std::chrono::system_clock::now();
 
     while (!glfwWindowShouldClose(win)) {
         glfwPollEvents();
 
+        auto now = std::chrono::system_clock::now();
+        auto timeDelta = now - prefFrameTime;
+        float speed = 16.0 * ((double) (timeDelta.count()) / speed1);
+
         if (glfwGetKey(win, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(win, GLFW_TRUE);
 
         if (glfwGetKey(win, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(win, GLFW_TRUE);
+
+        if (glfwGetKey(win, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+            offsetX -= speed;
+			offsetY += speed;
+		}
+        if (glfwGetKey(win, GLFW_KEY_LEFT) == GLFW_PRESS) {
+            offsetX += speed;
+			offsetY -= speed;
+		}
+		if (glfwGetKey(win, GLFW_KEY_DOWN) == GLFW_PRESS)
+            speed1 = 2000000.0;
+		
+		if (glfwGetKey(win, GLFW_KEY_UP) == GLFW_PRESS)
+            speed1 = 10000.0;
 
         int w = 0, h = 0;
         glfwGetFramebufferSize(win, &w, &h);
@@ -199,9 +208,12 @@ int main()
         glClearColor(0.02f, 0.02f, 0.02f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glUniform2f(gridOffsetLoc, offsetX, offsetY);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(win);
+
+        prefFrameTime = now;
     }
 
     glDeleteVertexArrays(1, &vao);
