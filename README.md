@@ -7,6 +7,7 @@ float randA(vec2 inCoord) {return fract(sinM(dot(inCoord, vec2(current_float, 44
 ```
 
 Check the effect of changing `current_float` to the following values: `(23) | (23.5) | (23.75) | (23.625) | (23.03125) | (23.000488) | (23.53)`
+
 Check the effect of running the program on Intel vs Nvidia/AMD GPUs
 
 ## Instructions:
