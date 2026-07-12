@@ -29,11 +29,11 @@ These values are passed through the same reduced perlin-style noise stages deriv
 
 In the side-by-side version:
 
-- **Left** = reduced perlin output using `float`.
-- **Right** = reduced perlin output using `uniform float`.
+- **Left** = reduced perlin output using `float`. **Exhibits unexpected behaviour**
+- **Right** = reduced perlin output using `uniform float`. **Behaves correctly.** 
 
 If both sides were effectively equivalent for this shader path, the two panels would look identical.
-However they differ significantly. With the left side exhibiting the issue from the original report.
+However they differ significantly. With the left side exhibiting the issue from the original report. The left side is defective.
 <img width="1202" height="938" alt="obraz" src="https://github.com/user-attachments/assets/6e8dc11d-82bf-4a9b-a06f-345e848ab7b8" />
 
 It should be noted that the vertical lines visible on the left side cannot be reproduced on any other GPU vendor. They should not exist.
