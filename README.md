@@ -34,6 +34,10 @@ In the side-by-side version:
 
 Both sides should be effectively equivalent for this shader path, the two panels should look identical.
 However they differ significantly. With the left side exhibiting the issue from the original report, and the right side serves as an issue-free control.
+
+It should be noted that the vertical lines visible on the left side cannot be reproduced on any other GPU vendor. They should not exist.
 <img width="1202" height="938" alt="obraz" src="https://github.com/user-attachments/assets/6e8dc11d-82bf-4a9b-a06f-345e848ab7b8" />
 
-It should be noted that the vertical lines visible on the left side cannot be reproduced on any other GPU vendor. Both sides should look like the right side.
+
+## Movable version
+`repro_movable.cpp` allows you to move the noise using arrow keys. You can change the speed of the movement with the `1` and `2` keys on the number row of your keyboard.
