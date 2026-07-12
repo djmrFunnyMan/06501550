@@ -16,7 +16,7 @@ float randB(vec2 inCoord) {return fract(sinM(dot(inCoord, vec2(value_U, 44.0))) 
 
 ## Goal
 
-The purpose of this repro is to isolate how changing how the literal `23.53` is provided propagates through the shader pipeline.
+The purpose of this repro is to isolate how changing the data type of the literal `23.53` propagates through the shader pipeline on Intel graphics.
 
 The code compares two paths:
 
@@ -32,9 +32,8 @@ In the side-by-side version:
 - **Left** = reduced perlin output using `float`. **Exhibits unexpected behaviour**
 - **Right** = reduced perlin output using `uniform float`. **Behaves correctly.** 
 
-If both sides were effectively equivalent for this shader path, the two panels would look identical.
-However they differ significantly. With the left side exhibiting the issue from the original report. The left side is defective.
+Both sides should be effectively equivalent for this shader path, the two panels should look identical.
+However they differ significantly. With the left side exhibiting the issue from the original report, and the right side serves as an issue-free control.
 <img width="1202" height="938" alt="obraz" src="https://github.com/user-attachments/assets/6e8dc11d-82bf-4a9b-a06f-345e848ab7b8" />
 
-It should be noted that the vertical lines visible on the left side cannot be reproduced on any other GPU vendor. They should not exist.
-
+It should be noted that the vertical lines visible on the left side cannot be reproduced on any other GPU vendor. Both sides should look like the right side.
