@@ -7,7 +7,7 @@ float value_F = 23.53;
 float randA(vec2 inCoord) {return fract(sinM(dot(inCoord, vec2(value_F, 44.0))) * 42350.45);}
 ```
 
-Changing it to the following fixes the issue.
+Changing it to the following fixes the issue (currently only confirmed to work on the Intel B580)
 
 ```glsl
 uniform float value_U = 23.53;
