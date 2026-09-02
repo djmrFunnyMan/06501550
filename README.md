@@ -4,7 +4,7 @@ Clearly this issue is caused by some driver optimization. Logically the best sol
 
 However this seems to have some side effects on its own, and thus I cannot use this method of fixing the bug.
 
-Why? Well I'm bad at explaining things so let's just go through this step by step.
+Why? Well I'm bad at explaining things so let's just go through this step by step. (But in summary, on OpenGL it severely alters the shape of the noise even with low offsets)
 
 Starting point:
 ```
@@ -66,16 +66,10 @@ Everything above concerned the OpenGL API. So what about Vulkan?
 
 Well on Vulkan I can use the `precise` qualifier and it does simply fix the original issue without changing the shape of the noise. The output looks the same whether I use the `precise` method or the push constant method.
 
-<img width="1202" height="938" alt="Zrzut ekranu 2026-09-02 213244" src="https://github.com/user-attachments/assets/f51db0b0-227b-4a20-9cf3-49f605f4f441" />
-<img width="1202" height="938" alt="Zrzut ekranu 2026-09-02 213317" src="https://github.com/user-attachments/assets/218237ed-7e62-4575-9dcd-66853729c87e" />
-<img width="1202" height="938" alt="Zrzut ekranu 2026-09-02 213426" src="https://github.com/user-attachments/assets/88a38642-88b0-403f-b21d-ecdad1045623" />
-
 
 So once Minecraft switches from OpenGL to the Vulkan API, using `precise` instead of push constants will be a viable option.
 
 
-
-
-
-
-
+<img width="1202" height="938" alt="Zrzut ekranu 2026-09-02 213244" src="https://github.com/user-attachments/assets/f51db0b0-227b-4a20-9cf3-49f605f4f441" />
+<img width="1202" height="938" alt="Zrzut ekranu 2026-09-02 213317" src="https://github.com/user-attachments/assets/218237ed-7e62-4575-9dcd-66853729c87e" />
+<img width="1202" height="938" alt="Zrzut ekranu 2026-09-02 213426" src="https://github.com/user-attachments/assets/88a38642-88b0-403f-b21d-ecdad1045623" />
