@@ -26,7 +26,7 @@ I use this command to build the executable.
    /OUT:repro_vulkan.exe
 ```
 
-## Setup
+## Introduction
 
 The code compares two paths:
 
