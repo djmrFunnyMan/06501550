@@ -1,6 +1,6 @@
 # Investigation: Using the precise qualifier.
 
-Clearly this issue is caused by some driver optimization. Logically the best solution should be using the `precise` qualifier to force a specific order of operation, instead of using the uniform workaround.
+Clearly this issue is caused by some driver optimization. Logically the best solution should be using the `precise` qualifier to force a specific order of operation, instead of using the uniform workaround. (Presumably providing the value as an uniform prevents the driver from being to apply whatever optimization is causing this)
 
 However this seems to have some side effects on its own, and thus I cannot use this method of fixing the bug.
 
