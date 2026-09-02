@@ -1,43 +1,81 @@
-# Investigation: Effect of passing the problematic float as an uniform.
+# Investigation: Using the precise qualifier.
 
-In the following code the issue can be seen.
+Clearly this issue is caused by some driver optimization. Logically the best solution should be using the `precise` qualifier to force a specific order of operation, instead of using the uniform workaround.
 
-```glsl
-float value_F = 23.53;
-float randA(vec2 inCoord) {return fract(sinM(dot(inCoord, vec2(value_F, 44.0))) * 42350.45);}
+However this seems to have some side effects on its own, and thus I cannot use this method of fixing the bug.
+
+Why? Well I'm bad at explaining things so let's just go through this step by step.
+
+Starting point:
+```
+float rand(vec2 inCoord)
+{
+    return fract(sinM(dot(inCoord, vec2(23.53, 44.0))) * 42350.45);
+}
+```
+Produces this result:
+<img width="1202" height="938" alt="Zrzut ekranu 2026-09-02 205654" src="https://github.com/user-attachments/assets/1a77e347-41a8-4222-a9f8-200400b2f16c" />
+
+
+
+Now let's try using the `precise` qualifier like this
+
+```
+precise float rand(vec2 inCoord)
+{
+    return fract(sinM(dot(inCoord, vec2(23.53, 44.0))) * 42350.45);
+}
 ```
 
-Changing it to the following fixes the issue (currently only confirmed to work on the Intel B580)
+Which results in:
+<img width="1202" height="938" alt="Zrzut ekranu 2026-09-02 205536" src="https://github.com/user-attachments/assets/9405ccdf-d0cb-41ef-b0c6-0fae73aee477" />
 
-```glsl
-uniform float value_U = 23.53;
-float randB(vec2 inCoord) {return fract(sinM(dot(inCoord, vec2(value_U, 44.0))) * 42350.45);}
+So the issue seems fixed right?
+
+But if I apply an offset...
+
+```
+vec2 inCoord = gridUV * 64.0 - 10000;
+```
+I get this result:
+<img width="1202" height="938" alt="Zrzut ekranu 2026-09-02 210530" src="https://github.com/user-attachments/assets/d5c44d4d-4190-45a3-bdb5-784cd3dc71b3" />
+
+This is a severe loss of precision. Thus I cannot use the `precise` qualifier to fix the original issue as the usecase requires applying some offset.
+
+
+
+Comparatively if I do
+
+```
+uniform float value1 = 23.53; 
+uniform float value2 = 44.0;
+
+float rand(vec2 inCoord)
+{
+    return fract(sinM(dot(inCoord, vec2(value1, value2))) * 42350.45);
+}
 ```
 
-## Goal
-
-The purpose of this repro is to isolate how changing the data type of the literal `23.53` propagates through the shader pipeline on Intel graphics.
-
-The code compares two paths:
-
-- **Path A** uses `float`.
-- **Path B** uses `uniform float`.
-
-These values are passed through the same reduced perlin-style noise stages derived from the original shader: `dot`, `sinM`, `fract`, `rand`, and `perlin`.
-
-## How to interpret the image
-
-In the side-by-side version:
-
-- **Left** = reduced perlin output using `float`. **Exhibits unexpected behaviour**
-- **Right** = reduced perlin output using `uniform float`. **Behaves correctly.** 
-
-Both sides should be effectively equivalent for this shader path, the two panels should look identical.
-However they differ significantly. With the left side exhibiting the issue from the original report, and the right side serves as an issue-free control.
-
-It should be noted that the vertical lines visible on the left side cannot be reproduced on any other GPU vendor. They should not exist.
-<img width="1202" height="938" alt="obraz" src="https://github.com/user-attachments/assets/6e8dc11d-82bf-4a9b-a06f-345e848ab7b8" />
+I can apply a much higher offset of 100000, without the noise losing its shape.
+<img width="1202" height="938" alt="Zrzut ekranu 2026-09-02 210658" src="https://github.com/user-attachments/assets/2e1db96a-04db-424e-b60e-36d96ac6735a" />
 
 
-## Movable version
-`repro_movable.cpp` allows you to move the noise using arrow keys. You can change the speed of the movement with the `1` and `2` keys on the number row of your keyboard.
+# Vulkan
+
+Everything above concerned the OpenGL API. So what about Vulkan?
+
+Well on Vulkan I can use the `precise` qualifier and it does simply fix the original issue without changing the shape of the noise. The output looks the same whether I use the `precise` method or the push constant method.
+
+<img width="1202" height="938" alt="Zrzut ekranu 2026-09-02 213244" src="https://github.com/user-attachments/assets/f51db0b0-227b-4a20-9cf3-49f605f4f441" />
+<img width="1202" height="938" alt="Zrzut ekranu 2026-09-02 213317" src="https://github.com/user-attachments/assets/218237ed-7e62-4575-9dcd-66853729c87e" />
+<img width="1202" height="938" alt="Zrzut ekranu 2026-09-02 213426" src="https://github.com/user-attachments/assets/88a38642-88b0-403f-b21d-ecdad1045623" />
+
+
+So once Minecraft switches from OpenGL to the Vulkan API, using `precise` instead of push constants will be a viable option.
+
+
+
+
+
+
+
